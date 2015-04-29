@@ -32,7 +32,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <stdio.h>
 #include <errno.h>
 #include <alsa/asoundlib.h>
 #include <alsa/mixer.h>
@@ -155,7 +154,6 @@ void printMiniplay(int zeile, int zeileMAX)
 
 	int pixelPlayUp = pixelZeileUp +2;
 	int pixelPlayDown = pixelPlayUp +7;
-
 	for(int x = 0; x < 5; x++)
 	{
 		while(pixelPlayUp < pixelPlayDown){
@@ -166,6 +164,229 @@ void printMiniplay(int zeile, int zeileMAX)
 		}	
 		pixelPlayUp = pixelZeileUp +2 +x;
 		pixelPlayDown = pixelZeileUp +9 -x;
+	}
+}
+
+void verzeichnisUSB(char *foo, char *dirname)
+{
+	int zeile = 1;
+	char tmp0[200];
+	char tmp1[200];
+	char tmp2[200];
+	char tmp3[200];
+	char tmp4[200];
+	//char tmp5[200];
+	//char foo[200];
+	int curr = 1;
+	int x = 2;
+
+	LCD_SetFont(0);
+	LCD_SetPenColor(0);
+
+	printf("In USB Funktion mit dirname: %s\n", dirname);
+
+	FILE *write;
+	write = fopen("/home/pi/workspace/curDir", "w+");
+	fprintf(write, "%s", dirname);
+	fclose(write);
+
+	DIR *dirp;
+	struct dirent *dp;
+	int zeileMAX = 0;
+
+	if ((dirp = opendir(dirname)) == NULL) {
+		perror("couldn't open '..'");
+		return;
+	}
+
+	//write filenames of directory dirname to dat
+	FILE *write1;
+	write1 = fopen("/home/pi/workspace/dat", "w+");
+
+	do {
+		errno = 0;
+		//count how many files are in directory + write to dat
+		if ((dp = readdir(dirp)) != NULL) {
+			zeileMAX++;
+			fprintf(write1, "%s\n",(dp->d_name));
+		}
+
+	} while (dp != NULL);
+	fclose(write1);
+	(void) closedir(dirp);
+
+	while(1)
+	{
+
+		FILE *read;
+		read = fopen("/home/pi/workspace/dat", "r+");
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
+		if(zeile == zeileMAX -1)
+		{
+			x = 3;
+		}
+		if(zeile == zeileMAX)
+		{
+			x = 4;
+		}
+
+		while(curr < zeile-x){
+			if(fgets(foo,200,read) == NULL){ continue;}
+			curr++;
+		}
+		if(fgets(tmp0,200,read) == NULL)
+		{
+			return;
+		}
+		if(fgets(tmp1,200,read) == NULL)
+		{
+			return;
+		}
+		if(fgets(tmp2,200,read) == NULL)
+		{
+			return;
+		}
+		if(fgets(tmp3,200,read) == NULL)
+		{
+			return;
+		}
+		if(fgets(tmp4,200,read) == NULL)
+		{
+			return;
+		}
+
+		if(zeile == 1)
+		{
+			LCD_PrintXYVz(8, 2,tmp0);
+			LCD_PrintXY(0,15,tmp1);
+			LCD_PrintXY(0,28,tmp2);
+			LCD_PrintXY(0,41,tmp3);
+			LCD_PrintXY(0,54,tmp4);
+			LCD_WriteFramebuffer();
+		}else if(zeile == 2)
+		{
+			LCD_PrintXY(0, 2,tmp0);
+			LCD_PrintXYVz(8,15,tmp1);
+			LCD_PrintXY(0,28,tmp2);
+			LCD_PrintXY(0,41,tmp3);
+			LCD_PrintXY(0,54,tmp4);
+			LCD_WriteFramebuffer();
+		}else if(zeile > 2 && zeile < zeileMAX-1)
+		{
+			LCD_PrintXY(0, 2,tmp0);
+			LCD_PrintXY(0,15,tmp1);
+			LCD_PrintXYVz(8,28,tmp2);
+			LCD_PrintXY(0,41,tmp3);
+			LCD_PrintXY(0,54,tmp4);
+			LCD_WriteFramebuffer();
+		}else if(zeile == zeileMAX-1)
+		{
+			LCD_PrintXY(0, 2,tmp0);
+			LCD_PrintXY(0,15,tmp1);
+			LCD_PrintXY(0,28,tmp2);
+			LCD_PrintXYVz(8,41,tmp3);
+			LCD_PrintXY(0,54,tmp4);
+			LCD_WriteFramebuffer();
+
+		}else if(zeile == zeileMAX)
+		{
+			LCD_PrintXY(0,2,tmp0);
+			LCD_PrintXY(0,15,tmp1);
+			LCD_PrintXY(0,28,tmp2);
+			LCD_PrintXY(0,41,tmp3);
+			LCD_PrintXYVz(8,54,tmp4);
+			LCD_WriteFramebuffer();
+		}
+
+		UpdateButtons();
+		if(BUTTON_PRESSED_DOWN)
+		{
+			if(zeile < zeileMAX)
+			{
+				zeile++;
+			}
+		}
+		if(BUTTON_PRESSED_UP)
+		{
+			if(zeile > 1)
+			{
+				zeile--;
+			}
+		}
+		if(BUTTON_PRESSED_MIDDLEV)
+		{
+			return;
+		}
+		if(BUTTON_PRESSED_MIDDLEH)
+		{
+			
+			DIR *dirp2;
+			struct dirent *dp2;
+
+			if ((dirp2 = opendir(dirname)) == NULL) {
+				perror("couldn't open '..'");
+				return;
+			}
+			int cur = 0;
+			do {
+				errno = 0;
+				dp2 = readdir(dirp2);
+				cur++;
+			} while (cur < zeile);
+
+			if(dp2->d_type == DT_DIR)
+			{
+
+				char *buffer = malloc (strlen (dirname) + strlen (dp2->d_name) + 2);
+				if (buffer == NULL) {
+					// Out of memory.
+				} else {
+					strcpy (buffer, dirname);
+					strcat (buffer, dp2->d_name);
+					strcat (buffer, "/");
+
+					FILE *write2;
+        				write2 = fopen("/home/pi/workspace/curDir", "w+");
+        				fprintf(write2, "%s", buffer);
+        				fclose(write2);
+					
+					verzeichnisUSB(foo, buffer);
+					free(buffer);
+					(void) closedir(dirp2);
+					fclose(read);
+					return;
+				}
+				return;
+
+			}else{
+
+				FILE *write3;
+				write3 = fopen("/home/pi/workspace/play", "w+");
+				fprintf(write3, "%d", 1);
+				fclose(write3);
+				
+				SleepMs(50);
+				
+				FILE *write4;
+				write4 = fopen("/home/pi/workspace/play", "w+");
+				fprintf(write4, "%d", 0);
+				fclose(write4);
+				
+				(void) closedir(dirp2);
+				fclose(read);
+				clearAll();
+				return;
+
+			}
+
+			(void) closedir(dirp2);
+
+		}		
+
+		curr = 1;
+		LCD_WriteFramebuffer();
+		fclose(read);
 	}
 }
 
@@ -492,36 +713,6 @@ void printVolume(void)
 	LCD_WriteFramebuffer();
 }
 
-void pauseSong(void)
-{
-	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
-	fprintf(write, "%s\n", "--pause");
-	fclose(write);	
-
-	SleepMs(100);
-
-	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
-	fprintf(write2, "%s\n", "xxx");
-	fclose(write2);
-}
-
-void playSong(void)
-{
-	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
-	fprintf(write, "%s\n", "--start");
-	fclose(write);	
-
-	SleepMs(100);
-
-	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
-	fprintf(write2, "%s\n", "xxx");
-	fclose(write2);
-}
-
 void setVolume(int volume)
 {
 
@@ -560,6 +751,36 @@ void setVolume(int volume)
 
 	snd_mixer_close(handle);
 
+}
+
+void pauseSong(void)
+{
+	FILE *write;
+	write = fopen("/home/pi/workspace/steuer", "w+");	
+	fprintf(write, "%s\n", "--pause");
+	fclose(write);	
+
+	SleepMs(100);
+
+	FILE *write2;
+	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	fprintf(write2, "%s\n", "xxx");
+	fclose(write2);
+}
+
+void playSong(void)
+{
+	FILE *write;
+	write = fopen("/home/pi/workspace/steuer", "w+");	
+	fprintf(write, "%s\n", "--start");
+	fclose(write);	
+
+	SleepMs(100);
+
+	FILE *write2;
+	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	fprintf(write2, "%s\n", "xxx");
+	fclose(write2);
 }
 
 void prevSong(void)
@@ -623,7 +844,7 @@ int main(int argc, char **argv)
 	int play = 1;
 	int volWait = 1;
 	char title[200];
-	
+
 	setVolume(volume);
 
 	LCD_PrintXY(34,26,"Hello :)");
@@ -641,7 +862,7 @@ int main(int argc, char **argv)
 			FILE *read;
 
 
-			read = fopen("/home/pi/workspace/bla", "r");		// open as file
+			read = fopen("/home/pi/workspace/currentTitle", "r");		// open as file
 			if(fgets(title,200,read) != NULL){
 				clearTitle();
 			}else{continue;}			// get line
@@ -655,6 +876,8 @@ int main(int argc, char **argv)
 			title[len+4] = '\0';
 			int pxlen = getPxLength(title);
 			LCD_SetFont(1);
+
+		//	printf("~~~~~~~~~~~~~~~~~~~~~~~~~ %s ~~~~~~~~~~~~~~~~~~~~~~\n", title);
 
 			if(play == 0)
 			{
@@ -681,45 +904,75 @@ int main(int argc, char **argv)
 		}		
 
 		//BUTTONS
-		while(volWait > 0){
-
-			UpdateButtons();
-			if(BUTTON_PRESSED_UP)
+		UpdateButtons();
+/*
+		//USB
+		if(BUTTON_PRESSED_UP)
+		{
+			verzeichnisUSB(foo, "/home/pi/");
+		
+			clearAll();
+			LCD_PrintXY(1,2,"A Stadelmayer Project");
+			printButtons(play);
+			LCD_PrintXY(i,20,title);
+			LCD_PrintXY(j,20,title);
+			LCD_SetFont(1);
+			play = 1;
+		}
+*/
+		//Lautstärkemenu
+		if(BUTTON_PRESSED_DOWN)
+		{
+			printVolume();
+			volWait = 30;
+			while(volWait > 0)
 			{
-				if(volume < 10){
-					volume += 1;
+	
+				UpdateButtons();
+				if(BUTTON_PRESSED_UP)
+				{
+				
+					if(volume < 30)
+					{
+						volume += 1;
+				   	}
+				   
+					setVolume(volume);
+					printVolume();
+					volWait = 30;
+				 
 				}
-				setVolume(volume);
-				printVolume();
-				volWait = 10;
-			}
 
-			if(BUTTON_PRESSED_DOWN)
-			{
-				if(volume > 0){
-					volume -= 1;
+				if(BUTTON_PRESSED_DOWN)
+				{
+					
+					if(volume > 0)
+					{
+						volume -= 1;
+					}
+
+					setVolume(volume);
+					printVolume();
+					volWait = 30;
 				}
-				setVolume(volume);
-				printVolume();
-				volWait = 10;
-			}
-			SleepMs(50);
-			volWait--;
-			//////////////////////////////////////////77
-			if(volWait == 2)
-			{
-				clearAll();
-				LCD_SetFont(0);
-				LCD_PrintXY(1,2,"A Stadelmayer Project");
-				LCD_SetFont(1);
-				LCD_PrintXY(i,20,title);
-				LCD_PrintXY(j,20,title);
-				printButtons(play);
-				LCD_WriteFramebuffer();
+				SleepMs(50);
+				volWait--;
+				//////////////////////////////////////////77
+				if(volWait == 2)
+				{
+					clearAll();
+					LCD_SetFont(0);
+					LCD_PrintXY(1,2,"A Stadelmayer Project");
+					LCD_SetFont(1);
+					LCD_PrintXY(i,20,title);
+					LCD_PrintXY(j,20,title);
+					printButtons(play);
+					LCD_WriteFramebuffer();
+				}
 			}
 		}
 
-		volWait = 1;
+		volWait = 30;
 
 		if(BUTTON_PRESSED_RIGHT)
 		{
@@ -764,7 +1017,22 @@ int main(int argc, char **argv)
 			LCD_PrintXY(i,20,title);
 			LCD_PrintXY(j,20,title);
 			LCD_SetFont(1);
-		}	
+		}
+
+		//USB
+		if(BUTTON_PRESSED_UP)
+		{
+			verzeichnisUSB(foo, "/media/usbstick/");
+		
+			clearAll();
+			LCD_PrintXY(1,2,"A Stadelmayer Project");
+			printButtons(play);
+			LCD_PrintXY(i,20,title);
+			LCD_PrintXY(j,20,title);
+			LCD_SetFont(1);
+			play = 1;
+		}
+
 	}
 	free(foo);
 	return(0);

@@ -2,7 +2,7 @@
 CC = gcc
 
 #CFLAGS  = -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marmv6z -Wall
-CFLAGS  = -std=c99 -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marm -O3 -Wall
+CFLAGS  = -std=gnu99 -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marm -O3 -Wall
 LD = ld
 LDFLAGS = -lrt -lasound -lm
 
