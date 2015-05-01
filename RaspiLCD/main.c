@@ -73,12 +73,6 @@ int volume = 5;
 // Return:    
 //--------------------------------------------------------------------------------------------------
 
-static void die(const char message[])
-{
-	perror("message");
-	exit(EXIT_FAILURE);
-}
-
 void DemoLogo(void)
 {
 	LCD_ClearScreen();
@@ -179,6 +173,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 	//char foo[200];
 	int curr = 1;
 	int x = 2;
+	int lineChanged = 1;
 
 	LCD_SetFont(0);
 	LCD_SetPenColor(0);
@@ -201,7 +196,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 
 	//write filenames of directory dirname to dat
 	FILE *write1;
-	write1 = fopen("/home/pi/workspace/dat", "w+");
+	write1 = fopen("/home/pi/workspace/datDir", "w+");
 
 	do {
 		errno = 0;
@@ -219,9 +214,9 @@ void verzeichnisUSB(char *foo, char *dirname)
 	{
 
 		FILE *read;
-		read = fopen("/home/pi/workspace/dat", "r+");
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+		read = fopen("/home/pi/workspace/datDir", "r+");
+		//clearAll();
+		//printMiniplay(zeile, zeileMAX);
 		if(zeile == zeileMAX -1)
 		{
 			x = 3;
@@ -256,47 +251,62 @@ void verzeichnisUSB(char *foo, char *dirname)
 			return;
 		}
 
-		if(zeile == 1)
+		if(zeile == 1 && lineChanged == 1)
 		{
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
 			LCD_PrintXYVz(8, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
 			LCD_PrintXY(0,41,tmp3);
 			LCD_PrintXY(0,54,tmp4);
-			LCD_WriteFramebuffer();
-		}else if(zeile == 2)
+			LCD_WriteFramebuffer(); 
+			lineChanged = 0;
+		}else if(zeile == 2 && lineChanged == 1)
 		{
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXYVz(8,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
 			LCD_PrintXY(0,41,tmp3);
 			LCD_PrintXY(0,54,tmp4);
 			LCD_WriteFramebuffer();
-		}else if(zeile > 2 && zeile < zeileMAX-1)
+			lineChanged = 0;
+		}else if(zeile > 2 && zeile < zeileMAX-1 && lineChanged == 1)
 		{
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXYVz(8,28,tmp2);
 			LCD_PrintXY(0,41,tmp3);
 			LCD_PrintXY(0,54,tmp4);
 			LCD_WriteFramebuffer();
-		}else if(zeile == zeileMAX-1)
+			lineChanged = 0;
+		}else if(zeile == zeileMAX-1 && lineChanged == 1)
 		{
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
 			LCD_PrintXYVz(8,41,tmp3);
 			LCD_PrintXY(0,54,tmp4);
 			LCD_WriteFramebuffer();
+			lineChanged = 0;
 
-		}else if(zeile == zeileMAX)
+		}else if(zeile == zeileMAX && lineChanged == 1)
 		{
+		clearAll();
+		printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0,2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
 			LCD_PrintXY(0,41,tmp3);
 			LCD_PrintXYVz(8,54,tmp4);
 			LCD_WriteFramebuffer();
+			lineChanged = 0;
 		}
 
 		UpdateButtons();
@@ -305,6 +315,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 			if(zeile < zeileMAX)
 			{
 				zeile++;
+				lineChanged = 1;
 			}
 		}
 		if(BUTTON_PRESSED_UP)
@@ -312,6 +323,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 			if(zeile > 1)
 			{
 				zeile--;
+				lineChanged = 1;
 			}
 		}
 		if(BUTTON_PRESSED_MIDDLEV)
@@ -320,7 +332,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 		}
 		if(BUTTON_PRESSED_MIDDLEH)
 		{
-			
+
 			DIR *dirp2;
 			struct dirent *dp2;
 
@@ -347,10 +359,10 @@ void verzeichnisUSB(char *foo, char *dirname)
 					strcat (buffer, "/");
 
 					FILE *write2;
-        				write2 = fopen("/home/pi/workspace/curDir", "w+");
-        				fprintf(write2, "%s", buffer);
-        				fclose(write2);
-					
+					write2 = fopen("/home/pi/workspace/curDir", "w+");
+					fprintf(write2, "%s", buffer);
+					fclose(write2);
+
 					verzeichnisUSB(foo, buffer);
 					free(buffer);
 					(void) closedir(dirp2);
@@ -360,19 +372,47 @@ void verzeichnisUSB(char *foo, char *dirname)
 				return;
 
 			}else{
+				/****************************/
+				//Musiktitel in dat schreiben
+				DIR *dirp3;
+				struct dirent *dp3;
+
+				if ((dirp3 = opendir(dirname)) == NULL) {
+					perror("couldn't open '..'");
+					return;
+				}
+
+				//write filenames of directory dirname to dat
+				FILE *write5;
+				write5 = fopen("/home/pi/workspace/dat", "w+");
+
+				do {
+					errno = 0;
+					//count how many files are in directory + write to dat
+					if ((dp3 = readdir(dirp3)) != NULL) {
+						if(dp3->d_type != DT_DIR)
+						{
+							fprintf(write5, "%s\n",(dp3->d_name));
+						}
+					}
+
+				} while (dp3 != NULL);
+				fclose(write5);
+				(void) closedir(dirp3);
+				/******************************/
 
 				FILE *write3;
 				write3 = fopen("/home/pi/workspace/play", "w+");
 				fprintf(write3, "%d", 1);
 				fclose(write3);
-				
+
 				SleepMs(50);
-				
+
 				FILE *write4;
 				write4 = fopen("/home/pi/workspace/play", "w+");
 				fprintf(write4, "%d", 0);
 				fclose(write4);
-				
+
 				(void) closedir(dirp2);
 				fclose(read);
 				clearAll();
@@ -406,7 +446,7 @@ int fliesstext(char *foo, int yPx, int zeile, int zeileMAX)
 	int pxlen = getPxLength(foo);
 
 	LCD_SetFont(0);
-	LCD_SetPenColor(1);
+	//	LCD_SetPenColor(1);
 
 	while(1){
 		SleepMs(100);
@@ -859,15 +899,14 @@ int main(int argc, char **argv)
 		if(play == 1){
 			SleepMs(50);
 			//***************************************** FLIESSTEXT MUSIKTITEL ***************************************************//
+
 			FILE *read;
-
-
 			read = fopen("/home/pi/workspace/currentTitle", "r");		// open as file
 			if(fgets(title,200,read) != NULL){
 				clearTitle();
 			}else{continue;}			// get line
-			int len = strlen(title);
 
+			int len = strlen(title);
 			title[len-1] = ' ';
 			title[len] = '-';
 			title[len+1] = '-';
@@ -876,16 +915,15 @@ int main(int argc, char **argv)
 			title[len+4] = '\0';
 			int pxlen = getPxLength(title);
 			LCD_SetFont(1);
-
-		//	printf("~~~~~~~~~~~~~~~~~~~~~~~~~ %s ~~~~~~~~~~~~~~~~~~~~~~\n", title);
-
-			if(play == 0)
-			{
-				LCD_PrintXY(i,20,title);
-				LCD_PrintXY(j,20,title);
-				continue;
-			}
-
+			/*
+			   if(play == 0)
+			   {
+			   printf("bin ich jemals hieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer?/n");
+			   LCD_PrintXY(i,20,title);
+			   LCD_PrintXY(j,20,title);
+			   continue;
+			   }
+			 */
 			LCD_PrintXY(i,20,title);
 			LCD_WriteFramebuffer();
 			fclose(read);		
@@ -905,47 +943,33 @@ int main(int argc, char **argv)
 
 		//BUTTONS
 		UpdateButtons();
-/*
-		//USB
-		if(BUTTON_PRESSED_UP)
-		{
-			verzeichnisUSB(foo, "/home/pi/");
-		
-			clearAll();
-			LCD_PrintXY(1,2,"A Stadelmayer Project");
-			printButtons(play);
-			LCD_PrintXY(i,20,title);
-			LCD_PrintXY(j,20,title);
-			LCD_SetFont(1);
-			play = 1;
-		}
-*/
+
 		//Lautstärkemenu
 		if(BUTTON_PRESSED_DOWN)
 		{
 			printVolume();
-			volWait = 30;
+			volWait = 25;
 			while(volWait > 0)
 			{
-	
+
 				UpdateButtons();
 				if(BUTTON_PRESSED_UP)
 				{
-				
-					if(volume < 30)
+
+					if(volume < 25)
 					{
 						volume += 1;
-				   	}
-				   
+					}
+
 					setVolume(volume);
 					printVolume();
-					volWait = 30;
-				 
+					volWait = 25;
+
 				}
 
 				if(BUTTON_PRESSED_DOWN)
 				{
-					
+
 					if(volume > 0)
 					{
 						volume -= 1;
@@ -953,7 +977,7 @@ int main(int argc, char **argv)
 
 					setVolume(volume);
 					printVolume();
-					volWait = 30;
+					volWait = 25;
 				}
 				SleepMs(50);
 				volWait--;
@@ -972,7 +996,7 @@ int main(int argc, char **argv)
 			}
 		}
 
-		volWait = 30;
+		volWait = 25;
 
 		if(BUTTON_PRESSED_RIGHT)
 		{
@@ -1023,7 +1047,7 @@ int main(int argc, char **argv)
 		if(BUTTON_PRESSED_UP)
 		{
 			verzeichnisUSB(foo, "/media/usbstick/");
-		
+
 			clearAll();
 			LCD_PrintXY(1,2,"A Stadelmayer Project");
 			printButtons(play);
