@@ -1,6 +1,6 @@
 #!/bin/bash
 sleep 5
-cd /home/pi/workspace/skripte
+cd /home/pi/workspace/RMP/skripte
 #pwd
 
 sudo ../RaspiLCD/raspilcd &

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/pi/workspace/
+cd /home/pi/workspace/RMP
 
 read -r l < curDir
 

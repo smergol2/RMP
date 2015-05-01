@@ -181,7 +181,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 	printf("In USB Funktion mit dirname: %s\n", dirname);
 
 	FILE *write;
-	write = fopen("/home/pi/workspace/curDir", "w+");
+	write = fopen("/home/pi/workspace/RMP/curDir", "w+");
 	fprintf(write, "%s", dirname);
 	fclose(write);
 
@@ -196,7 +196,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 
 	//write filenames of directory dirname to dat
 	FILE *write1;
-	write1 = fopen("/home/pi/workspace/datDir", "w+");
+	write1 = fopen("/home/pi/workspace/RMP/datDir", "w+");
 
 	do {
 		errno = 0;
@@ -214,7 +214,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 	{
 
 		FILE *read;
-		read = fopen("/home/pi/workspace/datDir", "r+");
+		read = fopen("/home/pi/workspace/RMP/datDir", "r+");
 		//clearAll();
 		//printMiniplay(zeile, zeileMAX);
 		if(zeile == zeileMAX -1)
@@ -359,7 +359,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 					strcat (buffer, "/");
 
 					FILE *write2;
-					write2 = fopen("/home/pi/workspace/curDir", "w+");
+					write2 = fopen("/home/pi/workspace/RMP/curDir", "w+");
 					fprintf(write2, "%s", buffer);
 					fclose(write2);
 
@@ -384,7 +384,7 @@ void verzeichnisUSB(char *foo, char *dirname)
 
 				//write filenames of directory dirname to dat
 				FILE *write5;
-				write5 = fopen("/home/pi/workspace/dat", "w+");
+				write5 = fopen("/home/pi/workspace/RMP/dat", "w+");
 
 				do {
 					errno = 0;
@@ -402,14 +402,14 @@ void verzeichnisUSB(char *foo, char *dirname)
 				/******************************/
 
 				FILE *write3;
-				write3 = fopen("/home/pi/workspace/play", "w+");
+				write3 = fopen("/home/pi/workspace/RMP/play", "w+");
 				fprintf(write3, "%d", 1);
 				fclose(write3);
 
 				SleepMs(50);
 
 				FILE *write4;
-				write4 = fopen("/home/pi/workspace/play", "w+");
+				write4 = fopen("/home/pi/workspace/RMP/play", "w+");
 				fprintf(write4, "%d", 0);
 				fclose(write4);
 
@@ -492,13 +492,13 @@ int fliesstext(char *foo, int yPx, int zeile, int zeileMAX)
 		}if(BUTTON_PRESSED_MIDDLEH)
 		{
 			FILE *write;
-			write = fopen("/home/pi/workspace/song", "w+");
+			write = fopen("/home/pi/workspace/RMP/song", "w+");
 			fprintf(write, "%d\n", zeile);
 			fclose(write);
 			SleepMs(200);
 
 			FILE *write2;
-			write2 = fopen("/home/pi/workspace/song", "w+");
+			write2 = fopen("/home/pi/workspace/RMP/song", "w+");
 			fprintf(write2, "%d\n", 0);
 			fclose(write2);
 		}
@@ -524,7 +524,7 @@ void verzeichnis(char *foo)
 
 	//find maximale anzahl zeilen
 	FILE *read;
-	read = fopen("/home/pi/workspace/dat", "r+");
+	read = fopen("/home/pi/workspace/RMP/dat", "r+");
 	while(fgets(tmp5,200,read) != NULL)
 	{
 		zeileMAX++;
@@ -532,7 +532,7 @@ void verzeichnis(char *foo)
 	fclose(read);
 	while(1){
 		FILE *read;
-		read = fopen("/home/pi/workspace/dat", "r+");
+		read = fopen("/home/pi/workspace/RMP/dat", "r+");
 		clearAll();
 		printMiniplay(zeile, zeileMAX);
 		if(zeile == zeileMAX -1)
@@ -796,14 +796,14 @@ void setVolume(int volume)
 void pauseSong(void)
 {
 	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
+	write = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write, "%s\n", "--pause");
 	fclose(write);	
 
 	SleepMs(100);
 
 	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	write2 = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write2, "%s\n", "xxx");
 	fclose(write2);
 }
@@ -811,14 +811,14 @@ void pauseSong(void)
 void playSong(void)
 {
 	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
+	write = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write, "%s\n", "--start");
 	fclose(write);	
 
 	SleepMs(100);
 
 	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	write2 = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write2, "%s\n", "xxx");
 	fclose(write2);
 }
@@ -826,14 +826,14 @@ void playSong(void)
 void prevSong(void)
 {
 	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
+	write = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write, "%s\n", "--prev");
 	fclose(write);	
 
 	SleepMs(100);
 
 	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	write2 = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write2, "%s\n", "xxx");
 	fclose(write2);
 }
@@ -841,14 +841,14 @@ void prevSong(void)
 void nextSong(void)
 {
 	FILE *write;
-	write = fopen("/home/pi/workspace/steuer", "w+");	
+	write = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write, "%s\n", "--next");
 	fclose(write);	
 
 	SleepMs(100);
 
 	FILE *write2;
-	write2 = fopen("/home/pi/workspace/steuer", "w+");	
+	write2 = fopen("/home/pi/workspace/RMP/steuer", "w+");	
 	fprintf(write2, "%s\n", "xxx");
 	fclose(write2);
 }
@@ -901,7 +901,7 @@ int main(int argc, char **argv)
 			//***************************************** FLIESSTEXT MUSIKTITEL ***************************************************//
 
 			FILE *read;
-			read = fopen("/home/pi/workspace/currentTitle", "r");		// open as file
+			read = fopen("/home/pi/workspace/RMP/currentTitle", "r");		// open as file
 			if(fgets(title,200,read) != NULL){
 				clearTitle();
 			}else{continue;}			// get line
