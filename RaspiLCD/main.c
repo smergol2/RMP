@@ -43,6 +43,11 @@
 #include "lcd.h"
 
 //=== Preprocessing directives (#define) ===========================================================
+#define TEXT "Bergkerwa 2015"
+#define TITLEX 21
+#define TITLEY 2
+#define BACKLIGHT 1
+#define CONTRAST 1
 
 //=== Type definitions (typedef) ===================================================================
 
@@ -866,7 +871,7 @@ int main(int argc, char **argv)
 
 	char *foo = malloc(200*sizeof(char));
 
-	//Contrast = 9;
+	//int Contrast = 9;
 	//Backlight = 1;
 
 	printf("RaspiLCD Demo V0.9 by Stadelmayer [" __DATE__ " " __TIME__"]\n");
@@ -874,7 +879,8 @@ int main(int argc, char **argv)
 
 	if(!RaspiLcdHwInit()) { printf("RaspiLcdHwInit() failed!\r\n"); return 1; }
 	LCD_Init();			// Init Display
-	SetBacklight(1);	// Turn Backlight on
+	SetBacklight(BACKLIGHT);		// Turn Backlight on
+	LCD_SetContrast(CONTRAST);		// Set Contrast
 
 	LCD_SetFont(1);
 
@@ -891,7 +897,7 @@ int main(int argc, char **argv)
 	LCD_WriteFramebuffer();
 	SleepMs(5000);	
 	printButtons(play);
-	LCD_PrintXY(1,2,"A Stadelmayer Project");
+	LCD_PrintXY(TITLEX,TITLEY,TEXT);
 
 	while(1)
 	{
@@ -915,15 +921,7 @@ int main(int argc, char **argv)
 			title[len+4] = '\0';
 			int pxlen = getPxLength(title);
 			LCD_SetFont(1);
-			/*
-			   if(play == 0)
-			   {
-			   printf("bin ich jemals hieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer?/n");
-			   LCD_PrintXY(i,20,title);
-			   LCD_PrintXY(j,20,title);
-			   continue;
-			   }
-			 */
+			
 			LCD_PrintXY(i,20,title);
 			LCD_WriteFramebuffer();
 			fclose(read);		
@@ -935,7 +933,7 @@ int main(int argc, char **argv)
 				LCD_WriteFramebuffer();
 				j--;
 			}
-			if(i == -(pxlen)){
+			if(i <= -(pxlen)){
 				i = 0;
 				j = 128;
 			}
@@ -986,7 +984,7 @@ int main(int argc, char **argv)
 				{
 					clearAll();
 					LCD_SetFont(0);
-					LCD_PrintXY(1,2,"A Stadelmayer Project");
+					LCD_PrintXY(TITLEX,TITLEY,TEXT);
 					LCD_SetFont(1);
 					LCD_PrintXY(i,20,title);
 					LCD_PrintXY(j,20,title);
@@ -1036,7 +1034,7 @@ int main(int argc, char **argv)
 			verzeichnis(foo);
 
 			clearAll();
-			LCD_PrintXY(1,2,"A Stadelmayer Project");
+			LCD_PrintXY(TITLEX,TITLEY,TEXT);
 			printButtons(play);
 			LCD_PrintXY(i,20,title);
 			LCD_PrintXY(j,20,title);
@@ -1049,7 +1047,7 @@ int main(int argc, char **argv)
 			verzeichnisUSB(foo, "/media/usbstick/");
 
 			clearAll();
-			LCD_PrintXY(1,2,"A Stadelmayer Project");
+			LCD_PrintXY(TITLEX,TITLEY,TEXT);
 			printButtons(play);
 			LCD_PrintXY(i,20,title);
 			LCD_PrintXY(j,20,title);
