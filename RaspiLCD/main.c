@@ -258,8 +258,8 @@ void verzeichnisUSB(char *foo, char *dirname)
 
 		if(zeile == 1 && lineChanged == 1)
 		{
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+			clearAll();
+			printMiniplay(zeile, zeileMAX);
 			LCD_PrintXYVz(8, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
@@ -269,8 +269,8 @@ void verzeichnisUSB(char *foo, char *dirname)
 			lineChanged = 0;
 		}else if(zeile == 2 && lineChanged == 1)
 		{
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+			clearAll();
+			printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXYVz(8,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
@@ -280,8 +280,8 @@ void verzeichnisUSB(char *foo, char *dirname)
 			lineChanged = 0;
 		}else if(zeile > 2 && zeile < zeileMAX-1 && lineChanged == 1)
 		{
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+			clearAll();
+			printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXYVz(8,28,tmp2);
@@ -291,8 +291,8 @@ void verzeichnisUSB(char *foo, char *dirname)
 			lineChanged = 0;
 		}else if(zeile == zeileMAX-1 && lineChanged == 1)
 		{
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+			clearAll();
+			printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0, 2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
@@ -303,8 +303,8 @@ void verzeichnisUSB(char *foo, char *dirname)
 
 		}else if(zeile == zeileMAX && lineChanged == 1)
 		{
-		clearAll();
-		printMiniplay(zeile, zeileMAX);
+			clearAll();
+			printMiniplay(zeile, zeileMAX);
 			LCD_PrintXY(0,2,tmp0);
 			LCD_PrintXY(0,15,tmp1);
 			LCD_PrintXY(0,28,tmp2);
@@ -903,7 +903,7 @@ int main(int argc, char **argv)
 	{
 
 		if(play == 1){
-			SleepMs(50);
+			SleepMs(100);
 			//***************************************** FLIESSTEXT MUSIKTITEL ***************************************************//
 
 			FILE *read;
@@ -921,17 +921,17 @@ int main(int argc, char **argv)
 			title[len+4] = '\0';
 			int pxlen = getPxLength(title);
 			LCD_SetFont(1);
-			
+
 			LCD_PrintXY(i,20,title);
 			LCD_WriteFramebuffer();
 			fclose(read);		
 
-			i--;
+			i=i-2;
 			if(i <= -(pxlen-128)){
 				LCD_SetFont(1);
 				LCD_PrintXY(j,20,title);
 				LCD_WriteFramebuffer();
-				j--;
+				j=j-2;
 			}
 			if(i <= -(pxlen)){
 				i = 0;
